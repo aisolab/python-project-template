@@ -1,0 +1,77 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:  
+  - repo: local
+    hooks:      
+      - id: set-test-env
+        name: set-test-env
+        entry: make set-test
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+
+  - repo: https://github.com/odwyersoftware/brunette
+    rev: 0.2.0
+    hooks:
+      - id: brunette
+        name: brunette
+        description: Run Brunette on Python code (fork of Black).
+        entry: brunette
+        language: python
+        types: [python]  
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.7.0
+    hooks:
+      - id: isort
+        name: isort
+        types: [python]
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.9
+    hooks:
+      - id: flake8                
+        verbose: true          
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: sort-simple-yaml
+      - id: requirements-txt-fixer
+      - id: check-json  
+
+  - repo: local
+    hooks:
+      # HACK:
+      # raise E0401, R0801 warning when run remote pylint repository            
+      # refers: https://github.com/pre-commit/pre-commit-hooks/issues/157
+      - id: pylint
+        name: pylint
+        entry: pylint src
+        language: system
+        pass_filenames: false
+        always_run: true
+        types: [python]
+        verbose: true
+
+      # HACK:
+      # impossible to use a remote pytest for pre-commit.
+      # because remote repository must contains `.pre-commit-hooks.yaml` for pre-commit
+      # but, currently(2021.03.13) pytest repository does not have `.pre-commit-hooks.yaml`
+      - id: pytest
+        name: pytest
+        entry: pytest --cov=src
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+
+      - id: clean
+        name: clean
+        entry: make clean
+        language: system
